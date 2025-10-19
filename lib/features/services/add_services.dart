@@ -1,4 +1,3 @@
-// lib/features/services/screens/add_service_screen.dart
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -17,13 +16,16 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
   final _nameController = TextEditingController();
   final _priceController = TextEditingController();
   final _descController = TextEditingController();
+  final _ratingController = TextEditingController(); // NEW: Rating
+  final _ordersController = TextEditingController(); // NEW: Orders count
+
   Uint8List? _webImage; // for web
   File? _mobileImage; // for mobile
   String? _uploadedImageUrl;
 
   bool _isLoading = false;
 
-  List<Map<String, dynamic>> _categories = []; // {name: '', icon: IconData}
+  List<Map<String, dynamic>> _categories = [];
   Map<String, IconData> _defaultIcons = {
     'Residential': Icons.home,
     'Commercial': Icons.apartment,
@@ -31,10 +33,14 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
   };
   String? _selectedCategory;
 
+  List<String> _durations = []; // NEW: Duration list
+  String? _selectedDuration; // NEW: Selected duration
+
   @override
   void initState() {
     super.initState();
     _loadCategories();
+    _loadDurations(); // NEW
   }
 
   Future<void> _loadCategories() async {
@@ -59,6 +65,25 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     setState(() {
       _categories.add({'name': name, 'icon': icon});
       _selectedCategory = name;
+    });
+  }
+
+  Future<void> _loadDurations() async {
+    final snapshot = await FirebaseFirestore.instance.collection('durations').get();
+    setState(() {
+      _durations = snapshot.docs.map((doc) => doc['value'] as String).toList();
+    });
+  }
+
+  Future<void> _addNewDuration(String value) async {
+    if (value.isEmpty) return;
+    await FirebaseFirestore.instance.collection('durations').add({
+      'value': value,
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+    setState(() {
+      _durations.add(value);
+      _selectedDuration = value;
     });
   }
 
@@ -117,10 +142,13 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     final price = _priceController.text.trim();
     final desc = _descController.text.trim();
     final category = _selectedCategory;
+    final duration = _selectedDuration ?? ''; // NEW
+    final rating = double.tryParse(_ratingController.text.trim()) ?? 0.0;
+    final orders = int.tryParse(_ordersController.text.trim()) ?? 0;
 
-    if (name.isEmpty || price.isEmpty || category == null) {
+    if (name.isEmpty || price.isEmpty || category == null || duration.isEmpty) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Please fill all fields')));
+          .showSnackBar(const SnackBar(content: Text('Please fill all required fields')));
       return;
     }
 
@@ -134,6 +162,9 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
         'price': double.tryParse(price) ?? 0,
         'description': desc,
         'category': category,
+        'duration': duration,
+        'rating': rating,
+        'ordersCount': orders,
         'imageUrl': _uploadedImageUrl ?? '',
         'createdAt': FieldValue.serverTimestamp(),
       });
@@ -159,7 +190,6 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              // Service name, price, description
               TextField(
                 controller: _nameController,
                 decoration: const InputDecoration(labelText: 'Service Name'),
@@ -175,6 +205,74 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                 controller: _descController,
                 decoration: const InputDecoration(labelText: 'Description'),
                 maxLines: 3,
+              ),
+              const SizedBox(height: 10),
+
+              // Duration dropdown with add
+              Row(
+                children: [
+                  Expanded(
+                    child: DropdownButtonFormField<String>(
+                      value: _selectedDuration,
+                      items: _durations.map((d) {
+                        return DropdownMenuItem<String>(
+                          value: d,
+                          child: Text(d),
+                        );
+                      }).toList(),
+                      onChanged: (v) => setState(() => _selectedDuration = v),
+                      decoration: const InputDecoration(
+                        labelText: 'Select Duration',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.add),
+                    onPressed: () async {
+                      final durationController = TextEditingController();
+                      await showDialog(
+                        context: context,
+                        builder: (_) => AlertDialog(
+                          title: const Text('Add New Duration'),
+                          content: TextField(
+                            controller: durationController,
+                            decoration: const InputDecoration(
+                              labelText: 'Duration (e.g., 30 mins)',
+                            ),
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text('Cancel'),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                final val = durationController.text.trim();
+                                Navigator.pop(context);
+                                _addNewDuration(val);
+                              },
+                              child: const Text('Add'),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+
+              TextField(
+                controller: _ratingController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(labelText: 'Rating (Optional, 0-5)'),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: _ordersController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(labelText: 'Orders Count (Optional)'),
               ),
               const SizedBox(height: 10),
 

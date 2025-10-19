@@ -1,5 +1,5 @@
 // lib/features/home/screens/home_screen.dart
-import 'package:broomie/core/providers/auth_provider.dart';
+import 'package:broomie/features/cart/presentation/carts.dart';
 import 'package:broomie/features/services/add_services.dart';
 import 'package:broomie/features/services/list_Services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -7,9 +7,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
+  @override
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
   // Map category name to icon
   static const Map<String, IconData> categoryIcons = {
     'Residential': Icons.home,
@@ -17,29 +22,109 @@ class HomeScreen extends ConsumerWidget {
     'Specialized': Icons.cleaning_services,
   };
 
+  final TextEditingController topSearchController = TextEditingController();
+  final TextEditingController serviceSearchController = TextEditingController();
+  String searchQuery = '';
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  void initState() {
+    super.initState();
+    serviceSearchController.addListener(() {
+      setState(() {
+        searchQuery = serviceSearchController.text.trim().toLowerCase();
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Home'),
-        actions: [
-          IconButton(
-            onPressed: () async {
-              await ref.read(authRepositoryProvider).signOut();
-            },
-            icon: const Icon(Icons.logout),
-          ),
-        ],
-      ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Welcome
+              // ---------------- Top Search + Cart ----------------
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: topSearchController,
+                      decoration: InputDecoration(
+                        hintText: 'Search services...',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                            vertical: 12, horizontal: 16),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const CartsScreen(),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.blue,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.shopping_cart,
+                        color: Colors.white,
+                        size: 28,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+
+              // ---------------- Banner Placeholder ----------------
+              Container(
+                width: double.infinity,
+                height: 120,
+                decoration: BoxDecoration(
+                  color: Colors.blueGrey[100],
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Center(
+                  child: Text(
+                    'Banner Placeholder',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black54,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // ---------------- Search Field (functional) ----------------
+              TextField(
+                controller: serviceSearchController,
+                decoration: InputDecoration(
+                  hintText: 'Search services by name...',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  prefixIcon: const Icon(Icons.search),
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // ---------------- Welcome ----------------
               Text(
                 'Welcome, ${user?.displayName ?? 'User'} 👋',
                 style: const TextStyle(
@@ -52,13 +137,13 @@ class HomeScreen extends ConsumerWidget {
                 user?.email != null
                     ? 'Email: ${user!.email}'
                     : user?.phoneNumber != null
-                    ? 'Phone: ${user!.phoneNumber}'
-                    : 'Signed in anonymously or unknown method',
+                        ? 'Phone: ${user!.phoneNumber}'
+                        : 'Signed in anonymously or unknown method',
                 style: const TextStyle(fontSize: 14),
               ),
               const Divider(height: 30),
 
-              // Service Management
+              // ---------------- Service Management ----------------
               const Text(
                 "Service Management",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -97,6 +182,7 @@ class HomeScreen extends ConsumerWidget {
                   ),
                 ],
               ),
+
               const SizedBox(height: 30),
 
               // ---------------- Available Services Section ----------------
@@ -132,7 +218,6 @@ class HomeScreen extends ConsumerWidget {
                       itemCount: categories.length + 1, // +1 for "See All"
                       itemBuilder: (context, index) {
                         if (index == categories.length) {
-                          // Last item = See All
                           return GestureDetector(
                             onTap: () {
                               Navigator.push(
@@ -188,10 +273,10 @@ class HomeScreen extends ConsumerWidget {
                   );
                 },
               ),
-              // Inside your HomeScreen Column, replacing the previous Cleaning Services GridView
+
               const SizedBox(height: 30),
 
-              // ---------------- Cleaning Services Section (Carousel) ----------------
+              // ---------------- Cleaning Services Section (Carousel with Search) ----------------
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -227,7 +312,14 @@ class HomeScreen extends ConsumerWidget {
                     return const Text('No services available.');
                   }
 
-                  final services = snapshot.data!.docs;
+                  final services = snapshot.data!.docs.where((service) {
+                    final name = (service['name'] ?? '').toString().toLowerCase();
+                    return name.contains(searchQuery);
+                  }).toList();
+
+                  if (services.isEmpty) {
+                    return const Text('No matching services found.');
+                  }
 
                   return SizedBox(
                     height: 200,
@@ -241,7 +333,7 @@ class HomeScreen extends ConsumerWidget {
                         final imageUrl = service['imageUrl'] ?? '';
 
                         return Container(
-                          width: 160, // ~2 per viewport on typical phone
+                          width: 160, // ~2 per viewport
                           margin: const EdgeInsets.only(right: 12),
                           child: Card(
                             shape: RoundedRectangleBorder(
@@ -256,21 +348,21 @@ class HomeScreen extends ConsumerWidget {
                                       ? ClipRRect(
                                           borderRadius:
                                               const BorderRadius.vertical(
-                                                top: Radius.circular(12),
-                                              ),
+                                            top: Radius.circular(12),
+                                          ),
                                           child: Image.network(
                                             imageUrl,
                                             fit: BoxFit.cover,
                                             errorBuilder:
                                                 (context, error, stackTrace) {
-                                                  return Container(
-                                                    color: Colors.grey[300],
-                                                    child: const Icon(
-                                                      Icons.broken_image,
-                                                      size: 40,
-                                                    ),
-                                                  );
-                                                },
+                                              return Container(
+                                                color: Colors.grey[300],
+                                                child: const Icon(
+                                                  Icons.broken_image,
+                                                  size: 40,
+                                                ),
+                                              );
+                                            },
                                           ),
                                         )
                                       : Container(
@@ -278,8 +370,8 @@ class HomeScreen extends ConsumerWidget {
                                             color: Colors.grey[300],
                                             borderRadius:
                                                 const BorderRadius.vertical(
-                                                  top: Radius.circular(12),
-                                                ),
+                                              top: Radius.circular(12),
+                                            ),
                                           ),
                                           child: const Icon(
                                             Icons.cleaning_services,
