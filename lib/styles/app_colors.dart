@@ -1,71 +1,42 @@
-// ignore_for_file: deprecated_member_use
-
+// Centralized color utilities for the app
+import 'package:flutter/material.dart';
 import 'dart:math';
 
-import 'package:flutter/material.dart';
+class AppColorsPage {
+  // Core palette
+  static const Color primaryColor = Color(0xFFF7F8FA); // soft off-white
+  static const Color secondaryColor = Color(0xFF4CAF50); // green
+  static const Color accentColor = Color(0xFF66D17A); // pastel accent
 
-class AppColorsPage extends StatelessWidget {
-  static const Color primaryColor = Colors.white;
-  static const Color secondaryColor = Color(0xFF4CAF50);
-  static const Color accentColor = Color(0xFF03A9F4);
-  static const Color lightGreen = Color(0xFFC8E6C9);
-  static const Color lightBlue = Color(0xFFB3E5FC);
-  static const Color darkGreen = Color(0xFF2E7D32);
-  static const Color darkBlue = Color(0xFF0288D1);
-  static const Color textColor = Colors.black87;
+  // Shade variations (derived)
+  static final Color secondaryLight = secondaryColor.withOpacity(0.92);
+  static final Color secondaryMedium = secondaryColor.withOpacity(0.72);
+  static final Color secondaryDark = Color(0xFF2E7D32);
 
-  const AppColorsPage({super.key}); 
+  // Neutral surfaces
+  static final Color backgroundNeutral = Colors.grey.shade50;
+  static final Color surfaceNeutral = Colors.white;
+  static final Color mutedText = Colors.black54;
+  static final Color textColor = Colors.black54;
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('App Colors Palette'),
-        backgroundColor: secondaryColor,
-      ),
-      body: Container(
-        color: primaryColor,
-        padding: EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Primary Color',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            ColorBox(color: primaryColor, label: 'White'),
-            SizedBox(height: 16),
-            Text(
-              'Secondary Colors',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            Row(
-              children: [
-                ColorBox(color: secondaryColor, label: 'Green'),
-                ColorBox(color: accentColor, label: 'Blue'),
-              ],
-            ),
-            SizedBox(height: 16),
-            Text(
-              'Shades',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            Wrap(
-              spacing: 10,
-              children: [
-                ColorBox(color: lightGreen, label: 'Light Green'),
-                ColorBox(color: lightBlue, label: 'Light Blue'),
-                ColorBox(color: darkGreen, label: 'Dark Green'),
-                ColorBox(color: darkBlue, label: 'Dark Blue'),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  // Accent gradient for buttons / highlights
+  static final Gradient primaryGradient = LinearGradient(
+    colors: [
+      secondaryColor.withOpacity(0.95),
+      secondaryColor.withOpacity(0.65),
+    ],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  // Subtle glass background for float elements
+  static final Color glassBackground = Colors.white.withOpacity(0.55);
+
+  // Utility
+  static Color withOpacity(Color c, double t) => c.withOpacity(t);
 }
 
+// Small swatch preview widget
 class ColorBox extends StatelessWidget {
   final Color color;
   final String label;
@@ -75,12 +46,12 @@ class ColorBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.all(4),
-      padding: EdgeInsets.all(16),
+      margin: const EdgeInsets.all(4),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: color,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey.shade300),
+        border: Border.all(color: Colors.grey.shade200),
       ),
       child: Text(
         label,
@@ -91,13 +62,12 @@ class ColorBox extends StatelessWidget {
     );
   }
 
-  // Simple function to decide text color based on background
   bool useWhiteForeground(Color backgroundColor) {
-    int v = sqrt(
-      pow(backgroundColor.red, 2) * 0.299 +
-          pow(backgroundColor.green, 2) * 0.587 +
-          pow(backgroundColor.blue, 2) * 0.114,
-    ).round();
+    final v = sqrt(
+      0.299 * pow(backgroundColor.red, 2) +
+          0.587 * pow(backgroundColor.green, 2) +
+          0.114 * pow(backgroundColor.blue, 2),
+    );
     return v < 130;
   }
 }

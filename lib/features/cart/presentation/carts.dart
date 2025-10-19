@@ -83,7 +83,7 @@ class _CartsScreenState extends ConsumerState<CartsScreen> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      color: AppColorsPage.lightBlue,
+                      color: AppColorsPage.secondaryLight,
                       child: ListTile(
                         contentPadding: const EdgeInsets.symmetric(
                             horizontal: 12, vertical: 8),
@@ -98,7 +98,7 @@ class _CartsScreenState extends ConsumerState<CartsScreen> {
                                 ),
                               )
                             : CircleAvatar(
-                                backgroundColor: AppColorsPage.lightGreen,
+                                backgroundColor: AppColorsPage.secondaryLight,
                                 child: Text(
                                   it.name.isNotEmpty ? it.name[0] : '?',
                                   style: const TextStyle(
@@ -201,7 +201,7 @@ class CartSummary extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      color: AppColorsPage.lightGreen,
+      color: AppColorsPage.secondaryLight,
       child: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Row(

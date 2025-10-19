@@ -3,6 +3,7 @@ import 'package:broomie/core/providers/service_provider.dart';
 import 'package:broomie/core/providers/cart_provider.dart';
 import 'package:broomie/core/models/cart_item_model.dart';
 import 'package:broomie/styles/app_colors.dart';
+import 'package:broomie/features/services/widgets/service_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -25,7 +26,7 @@ class ServicesListScreen extends ConsumerWidget {
             body: Center(
               child: Text(
                 'No categories found.',
-                style: TextStyle(color: AppColorsPage.textColor, fontSize: 16),
+                style: TextStyle(color: AppColorsPage.mutedText, fontSize: 16),
               ),
             ),
           );
@@ -63,56 +64,17 @@ class ServicesListScreen extends ConsumerWidget {
                             final selections = ref.watch(_selectionProvider);
                             final qty =
                                 selections[service.id ?? service.name] ?? 0;
-                            return Card(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              color: AppColorsPage.lightBlue,
-                              margin: const EdgeInsets.only(bottom: 12),
-                              child: ListTile(
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 8,
-                                ),
-                                leading: service.imageUrl.isNotEmpty
-                                    ? ClipRRect(
-                                        borderRadius: BorderRadius.circular(8),
-                                        child: Image.network(
-                                          service.imageUrl,
-                                          width: 64,
-                                          height: 64,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      )
-                                    : CircleAvatar(
-                                        backgroundColor:
-                                            AppColorsPage.lightGreen,
-                                        child: Text(
-                                          service.name.isNotEmpty
-                                              ? service.name[0]
-                                              : '?',
-                                          style: TextStyle(
-                                            color: AppColorsPage.textColor,
-                                          ),
-                                        ),
-                                      ),
-                                title: Text(
-                                  service.name,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColorsPage.textColor,
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                ServiceCard(service: service),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12.0,
+                                    vertical: 6,
                                   ),
-                                ),
-                                subtitle: Text(
-                                  '\$${service.price.toStringAsFixed(2)}',
-                                  style: TextStyle(
-                                    color: AppColorsPage.textColor,
-                                  ),
-                                ),
-                                trailing: SizedBox(
-                                  width: 120,
                                   child: Row(
-                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
                                       IconButton(
                                         icon: Icon(
@@ -154,7 +116,7 @@ class ServicesListScreen extends ConsumerWidget {
                                       Text(
                                         '$qty',
                                         style: TextStyle(
-                                          color: AppColorsPage.textColor,
+                                          color: AppColorsPage.mutedText,
                                         ),
                                       ),
                                       IconButton(
@@ -182,7 +144,7 @@ class ServicesListScreen extends ConsumerWidget {
                                     ],
                                   ),
                                 ),
-                              ),
+                              ],
                             );
                           },
                         ),
@@ -190,8 +152,8 @@ class ServicesListScreen extends ConsumerWidget {
                             const Center(child: CircularProgressIndicator()),
                         error: (e, _) => Center(
                           child: Text(
-                            'Error: $e',
-                            style: TextStyle(color: AppColorsPage.textColor),
+                            'Error loading services',
+                            style: TextStyle(color: AppColorsPage.mutedText),
                           ),
                         ),
                       ),
@@ -202,7 +164,7 @@ class ServicesListScreen extends ConsumerWidget {
                         vertical: 12,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColorsPage.lightGreen,
+                        color: AppColorsPage.secondaryLight,
                         borderRadius: const BorderRadius.vertical(
                           top: Radius.circular(12),
                         ),
@@ -231,7 +193,7 @@ class ServicesListScreen extends ConsumerWidget {
                                   'Items: $count   Total: \$${total.toStringAsFixed(2)}',
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    color: AppColorsPage.textColor,
+                                    color: AppColorsPage.mutedText,
                                   ),
                                 );
                               },
@@ -309,7 +271,7 @@ class ServicesListScreen extends ConsumerWidget {
         body: Center(
           child: Text(
             'Error loading categories',
-            style: TextStyle(color: AppColorsPage.textColor),
+            style: TextStyle(color: AppColorsPage.mutedText),
           ),
         ),
       ),

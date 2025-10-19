@@ -25,22 +25,37 @@ class _BottomNavPageState extends State<BottomNavPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBody: true, // allows floating bar to overlay content
-      body: _screens[_currentIndex],
+      body: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 450),
+        transitionBuilder: (child, animation) {
+          final offsetAnim = Tween<Offset>(
+            begin: const Offset(0.0, 0.05),
+            end: Offset.zero,
+          ).animate(animation);
+          return FadeTransition(
+            opacity: animation,
+            child: SlideTransition(position: offsetAnim, child: child),
+          );
+        },
+        child: _screens[_currentIndex],
+      ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(25),
+          borderRadius: BorderRadius.circular(24),
           child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+            filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
             child: Container(
-              height: 70,
+              height: 72,
               decoration: BoxDecoration(
-                color: AppColorsPage.primaryColor.withOpacity(0.6),
+                gradient: AppColorsPage.primaryGradient,
+                color: AppColorsPage.glassBackground,
+                borderRadius: BorderRadius.circular(24),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black26,
-                    blurRadius: 12,
-                    offset: const Offset(0, 6),
+                    color: Colors.black.withOpacity(0.08),
+                    blurRadius: 18,
+                    offset: const Offset(0, 8),
                   ),
                 ],
               ),
@@ -51,16 +66,16 @@ class _BottomNavPageState extends State<BottomNavPage> {
                   String label;
                   switch (index) {
                     case 0:
-                      icon = Icons.home;
+                      icon = Icons.home_outlined;
                       label = 'Home';
                       break;
                     case 1:
-                      icon = Icons.calendar_today;
+                      icon = Icons.calendar_month_outlined;
                       label = 'Bookings';
                       break;
                     case 2:
                     default:
-                      icon = Icons.person;
+                      icon = Icons.person_outline;
                       label = 'Account';
                       break;
                   }
@@ -70,39 +85,40 @@ class _BottomNavPageState extends State<BottomNavPage> {
                     child: GestureDetector(
                       onTap: () => setState(() => _currentIndex = index),
                       behavior: HitTestBehavior.opaque,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            icon,
-                            color: isActive
-                                ? AppColorsPage.secondaryColor
-                                : Colors.grey.shade400,
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            label,
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight:
-                                  isActive ? FontWeight.bold : FontWeight.normal,
-                              color: isActive
-                                  ? AppColorsPage.secondaryColor
-                                  : Colors.grey.shade400,
+                      child: AnimatedScale(
+                        duration: const Duration(milliseconds: 250),
+                        scale: isActive ? 1.08 : 1.0,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              icon,
+                              color: isActive ? Colors.white : Colors.white70,
                             ),
-                          ),
-                          const SizedBox(height: 4),
-                          AnimatedContainer(
-                            duration: const Duration(milliseconds: 300),
-                            height: 3,
-                            width: isActive ? 20 : 0,
-                            decoration: BoxDecoration(
-                              color: AppColorsPage.secondaryColor,
-                              borderRadius: BorderRadius.circular(2),
+                            const SizedBox(height: 4),
+                            Text(
+                              label,
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: isActive
+                                    ? FontWeight.w600
+                                    : FontWeight.w400,
+                                color: isActive ? Colors.white : Colors.white70,
+                              ),
                             ),
-                          ),
-                        ],
+                            const SizedBox(height: 6),
+                            AnimatedContainer(
+                              duration: const Duration(milliseconds: 300),
+                              height: 4,
+                              width: isActive ? 28 : 0,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.9),
+                                borderRadius: BorderRadius.circular(3),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   );

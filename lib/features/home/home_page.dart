@@ -104,7 +104,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   width: double.infinity,
                   height: 120,
                   decoration: BoxDecoration(
-                    color: AppColorsPage.lightBlue,
+                    color: AppColorsPage.secondaryLight,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Center(
@@ -257,7 +257,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               children: [
                                 CircleAvatar(
                                   radius: 24,
-                                  backgroundColor: AppColorsPage.lightGreen,
+                                  backgroundColor: AppColorsPage.accentColor,
                                   child: Icon(
                                     icon,
                                     size: 28,
@@ -364,7 +364,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                           )
                                         : Container(
                                             decoration: BoxDecoration(
-                                              color: AppColorsPage.lightBlue,
+                                              color: AppColorsPage.
+                                              secondaryLight,
                                               borderRadius:
                                                   const BorderRadius.vertical(
                                                     top: Radius.circular(12),

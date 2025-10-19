@@ -85,7 +85,7 @@ class BookingsScreen extends StatelessWidget {
                 margin: const EdgeInsets.symmetric(vertical: 8),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12)),
-                color: AppColorsPage.lightBlue,
+                color: AppColorsPage.secondaryLight,
                 child: Padding(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
@@ -112,7 +112,7 @@ class BookingsScreen extends StatelessWidget {
                         runSpacing: 4,
                         children: items
                             .map((it) => Chip(
-                                  backgroundColor: AppColorsPage.lightGreen,
+                                  backgroundColor: AppColorsPage.secondaryLight,
                                   label: Text(
                                     '${it.name} x${it.quantity}',
                                     style: TextStyle(

@@ -25,7 +25,7 @@ class AccountScreen extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 30,
-                  backgroundColor: AppColorsPage.lightGreen,
+                  backgroundColor: AppColorsPage.accentColor,
                   child: Text(
                     user?.displayName != null
                         ? user!.displayName![0].toUpperCase()
@@ -104,7 +104,7 @@ class AccountOption extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 6),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
       decoration: BoxDecoration(
-        color: AppColorsPage.lightBlue,
+        color: AppColorsPage.secondaryColor,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
