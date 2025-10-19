@@ -1,6 +1,5 @@
-
 class Service {
-  final String id;
+  final String? id;
   final String name;
   final double price;
   final String description;
@@ -11,7 +10,7 @@ class Service {
   final String imageUrl;
 
   Service({
-    required this.id,
+    this.id,
     required this.name,
     required this.price,
     required this.description,
@@ -22,9 +21,9 @@ class Service {
     required this.imageUrl,
   });
 
-  factory Service.fromDoc(Map<String, dynamic> data, String docId) {
+  factory Service.fromDoc(String id, Map<String, dynamic> data) {
     return Service(
-      id: docId,
+      id: id,
       name: data['name'] ?? '',
       price: (data['price'] ?? 0).toDouble(),
       description: data['description'] ?? '',

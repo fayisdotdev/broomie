@@ -14,9 +14,9 @@ class AuthWrapper extends ConsumerWidget {
     return authState.when(
       data: (user) {
         if (user != null) {
-          return const BottomNavPage(); // redirect to bottom nav
+          return const BottomNavPage(); 
         } else {
-          return const LoginScreen(); // not logged in
+          return const LoginScreen(); 
         }
       },
       loading: () => const Scaffold(
