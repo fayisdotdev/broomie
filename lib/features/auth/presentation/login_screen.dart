@@ -1,6 +1,7 @@
 // lib/features/auth/screens/login_screen.dart
 import 'package:broomie/core/providers/auth_provider.dart';
 import 'package:broomie/features/auth/presentation/signup_screen.dart';
+import 'package:broomie/styles/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -26,18 +27,29 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final authCtrl = ref.read(authControllerProvider.notifier);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Login')),
+      appBar: AppBar(title: const Text('Welcome Back')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
+          
           children: [
+            const SizedBox(height: 80,),
             /// ---------- GOOGLE SIGN-IN ----------
             ElevatedButton.icon(
               onPressed: () async {
                 await authCtrl.signInWithGoogle();
               },
-              icon: const Icon(Icons.g_mobiledata),
-              label: const Text("Sign in with Google", style: TextStyle(color: Colors.white)),
+              icon: const Icon(
+                Icons.g_mobiledata,
+                color: AppColorsPage.primaryColor,
+              ),
+              label: const Text(
+                "Sign in with Google",
+                style: TextStyle(color: Colors.white),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColorsPage.secondaryColor,
+              ),
             ),
 
             const Divider(height: 40),
@@ -69,7 +81,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ).showSnackBar(SnackBar(content: Text('Login failed: $e')));
                 }
               },
-              child: const Text("Login with Email", style: TextStyle(color: Colors.white),),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColorsPage.secondaryColor,
+              ),
+              child: const Text(
+                "Login with Email",
+                style: TextStyle(color: Colors.white),
+              ),
             ),
 
             TextButton(
@@ -125,7 +143,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   );
                 }
               },
-              child: Text(codeSent ? "Verify OTP" : "Send OTP", style: TextStyle(color: Colors.white)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColorsPage.secondaryColor,
+              ),
+
+              child: Text(
+                codeSent ? "Verify OTP" : "Send OTP",
+                style: TextStyle(color: Colors.white),
+              ),
             ),
           ],
         ),
