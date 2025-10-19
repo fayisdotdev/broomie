@@ -1,5 +1,5 @@
 import 'package:broomie/features/cart/presentation/carts.dart';
-import 'package:broomie/features/services/add_services.dart';
+// import 'package:broomie/features/services/add_services.dart';
 import 'package:broomie/features/services/list_Services.dart';
 import 'package:broomie/styles/app_colors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -38,7 +38,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return InputDecoration(
       hintText: hint,
       filled: true,
-      fillColor: AppColorsPage.primaryColor,
+      fillColor: AppColorsPage.glassBackground,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide(color: AppColorsPage.secondaryColor),
@@ -55,7 +55,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColorsPage.primaryColor,
+      backgroundColor: Theme.of(context).colorScheme.background,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
@@ -104,17 +104,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   width: double.infinity,
                   height: 120,
                   decoration: BoxDecoration(
-                    color: AppColorsPage.secondaryLight,
+                    color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColorsPage.elevationOverlay,
+                        blurRadius: 10,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
                   ),
-                  child: const Center(
+                  child: Center(
                     child: Text(
                       'Perfect cleaning service,\nalways ready for you.',
-                      style: TextStyle(
-                        fontSize: 20,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: Colors.black54,
                       ),
+                      textAlign: TextAlign.center,
                     ),
                   ),
                 ),
@@ -125,67 +131,77 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   controller: serviceSearchController,
                   decoration: _inputDecoration('Search services by name...'),
                 ),
-                const SizedBox(height: 20),
+                // const SizedBox(height: 20),
 
                 // Service Management
-                const Text(
-                  "Service Management",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const AddServiceScreen(),
-                            ),
-                          );
-                        },
-                        icon: const Icon(Icons.add),
-                        label: const Text('Add Service'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColorsPage.secondaryColor,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const ServicesListScreen(),
-                            ),
-                          );
-                        },
-                        icon: const Icon(Icons.list_alt),
-                        label: const Text('View Services'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColorsPage.secondaryColor,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                // Text(
+                //   "Service Management",
+                //   style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                //     fontWeight: FontWeight.bold,
+                //   ),
+                // ),
+                // const SizedBox(height: 16),
+                // Row(
+                //   children: [
+                //     Expanded(
+                //       child: ElevatedButton.icon(
+                //         onPressed: () {
+                //           Navigator.push(
+                //             context,
+                //             MaterialPageRoute(
+                //               builder: (_) => const AddServiceScreen(),
+                //             ),
+                //           );
+                //         },
+                //         // icon: const Icon(Icons.add),
+                //         label: const Text(
+                //           'Add Service',
+                //           style: TextStyle(color: Colors.white),
+                //         ),
+                //         style: ElevatedButton.styleFrom(
+                //           backgroundColor: AppColorsPage.secondaryColor,
+                //           shape: RoundedRectangleBorder(
+                //             borderRadius: BorderRadius.circular(12),
+                //           ),
+                //           padding: const EdgeInsets.symmetric(vertical: 14),
+                //         ),
+                //       ),
+                //     ),
+                //     const SizedBox(width: 10),
+                //     Expanded(
+                //       child: ElevatedButton.icon(
+                //         onPressed: () {
+                //           Navigator.push(
+                //             context,
+                //             MaterialPageRoute(
+                //               builder: (_) => const ServicesListScreen(),
+                //             ),
+                //           );
+                //         },
+                //         // icon: const Icon(Icons.list_alt),
+                //         label: const Text(
+                //           'View Services',
+                //           style: TextStyle(color: Colors.white),
+                //         ),
+                //         style: ElevatedButton.styleFrom(
+                //           backgroundColor: AppColorsPage.secondaryColor,
+                //           shape: RoundedRectangleBorder(
+                //             borderRadius: BorderRadius.circular(12),
+                //           ),
+                //           padding: const EdgeInsets.symmetric(vertical: 14),
+                //         ),
+                //       ),
+                //     ),
+                //   ],
+                // ),
                 const SizedBox(height: 30),
 
                 // Available Services Section
-                const Text(
+                Text(
                   "Available Services",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 16),
                 StreamBuilder<QuerySnapshot>(
@@ -261,17 +277,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   child: Icon(
                                     icon,
                                     size: 28,
-                                    color: AppColorsPage.textColor,
+                                    color: AppColorsPage.onBackground,
                                   ),
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
                                   category,
                                   textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: AppColorsPage.textColor,
-                                  ),
+                                  style: Theme.of(context).textTheme.bodySmall,
                                 ),
                               ],
                             ),
@@ -364,8 +377,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                           )
                                         : Container(
                                             decoration: BoxDecoration(
-                                              color: AppColorsPage.
-                                              secondaryLight,
+                                              color:
+                                                  AppColorsPage.secondaryLight,
                                               borderRadius:
                                                   const BorderRadius.vertical(
                                                     top: Radius.circular(12),

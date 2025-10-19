@@ -19,7 +19,9 @@ class BookingsScreen extends StatelessWidget {
         body: Center(
           child: Text(
             'Please sign in to view bookings',
-            style: TextStyle(color: AppColorsPage.textColor, fontSize: 16),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(fontSize: 16),
           ),
         ),
       );
@@ -35,7 +37,7 @@ class BookingsScreen extends StatelessWidget {
         );
 
     return Scaffold(
-      backgroundColor: AppColorsPage.primaryColor,
+      backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
         title: const Text('Bookings'),
         backgroundColor: AppColorsPage.secondaryColor,
@@ -49,8 +51,10 @@ class BookingsScreen extends StatelessWidget {
           }
           if (snap.hasError) {
             return Center(
-              child: Text('Error: ${snap.error}',
-                  style: TextStyle(color: AppColorsPage.textColor)),
+              child: Text(
+                'Error: ${snap.error}',
+                style: TextStyle(color: AppColorsPage.textColor),
+              ),
             );
           }
           final docs = snap.data?.docs ?? [];
@@ -58,7 +62,9 @@ class BookingsScreen extends StatelessWidget {
             return Center(
               child: Text(
                 'No bookings yet',
-                style: TextStyle(color: AppColorsPage.textColor, fontSize: 16),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(fontSize: 16),
               ),
             );
           }
@@ -84,41 +90,43 @@ class BookingsScreen extends StatelessWidget {
               return Card(
                 margin: const EdgeInsets.symmetric(vertical: 8),
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
-                color: AppColorsPage.secondaryLight,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                color: Theme.of(context).colorScheme.surface,
                 child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 14,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Booking • $formatted',
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: AppColorsPage.textColor),
+                        'Booking \u2022 $formatted',
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 6),
                       Text(
                         'Items: ${items.length}',
-                        style: TextStyle(
-                            fontSize: 14,
-                            color: AppColorsPage.textColor),
+                        style: Theme.of(context).textTheme.bodyMedium,
                       ),
                       const SizedBox(height: 8),
                       Wrap(
                         spacing: 6,
                         runSpacing: 4,
                         children: items
-                            .map((it) => Chip(
-                                  backgroundColor: AppColorsPage.secondaryLight,
-                                  label: Text(
-                                    '${it.name} x${it.quantity}',
-                                    style: TextStyle(
-                                        color: AppColorsPage.textColor),
-                                  ),
-                                ))
+                            .map(
+                              (it) => Chip(
+                                backgroundColor: Theme.of(
+                                  context,
+                                ).colorScheme.primary.withOpacity(0.12),
+                                label: Text(
+                                  '${it.name} x${it.quantity}',
+                                  style: Theme.of(context).textTheme.bodySmall,
+                                ),
+                              ),
+                            )
                             .toList(),
                       ),
                     ],

@@ -137,24 +137,6 @@ class _ServiceCardState extends State<ServiceCard> {
                               Text(service.rating.toString()),
                             ],
                           ),
-                          const SizedBox(height: 8),
-                          ElevatedButton(
-                            onPressed: () {
-                              // Add to cart logic handled elsewhere
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColorsPage.secondaryColor,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 14,
-                                vertical: 8,
-                              ),
-                              elevation: 4,
-                            ),
-                            child: const Text('Book'),
-                          ),
                         ],
                       ),
                     ],

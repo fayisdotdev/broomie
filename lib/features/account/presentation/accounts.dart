@@ -10,7 +10,7 @@ class AccountScreen extends StatelessWidget {
     final user = FirebaseAuth.instance.currentUser;
 
     return Scaffold(
-      backgroundColor: AppColorsPage.primaryColor,
+      backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
         title: const Text('Account'),
         backgroundColor: AppColorsPage.secondaryColor,
@@ -30,8 +30,9 @@ class AccountScreen extends StatelessWidget {
                     user?.displayName != null
                         ? user!.displayName![0].toUpperCase()
                         : 'U',
-                    style: const TextStyle(
-                        fontSize: 24, fontWeight: FontWeight.bold),
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -40,19 +41,14 @@ class AccountScreen extends StatelessWidget {
                   children: [
                     Text(
                       user?.displayName ?? 'Fathima Ebrahim',
-                      style: TextStyle(
-                        fontSize: 20,
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: AppColorsPage.textColor,
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       user?.phoneNumber ?? '+91 908 786 4233',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: AppColorsPage.textColor,
-                      ),
+                      style: Theme.of(context).textTheme.bodyMedium,
                     ),
                   ],
                 ),
@@ -83,6 +79,7 @@ class AccountScreen extends StatelessWidget {
                 minimumSize: const Size.fromHeight(50),
               ),
             ),
+            const SizedBox(height: 100),
           ],
         ),
       ),
@@ -95,8 +92,12 @@ class AccountOption extends StatelessWidget {
   final String? subtitle;
   final IconData icon;
 
-  const AccountOption(
-      {required this.title, this.subtitle, required this.icon, super.key});
+  const AccountOption({
+    required this.title,
+    this.subtitle,
+    required this.icon,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -104,12 +105,12 @@ class AccountOption extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 6),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
       decoration: BoxDecoration(
-        color: AppColorsPage.secondaryColor,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         children: [
-          Icon(icon, color: AppColorsPage.accentColor),
+          Icon(icon, color: AppColorsPage.secondaryColor),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -117,17 +118,14 @@ class AccountOption extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: AppColorsPage.textColor),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
                 ),
                 if (subtitle != null)
                   Text(
                     subtitle!,
-                    style: TextStyle(
-                        fontSize: 14,
-                        color: AppColorsPage.textColor),
+                    style: Theme.of(context).textTheme.bodyMedium,
                   ),
               ],
             ),

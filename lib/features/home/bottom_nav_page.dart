@@ -94,7 +94,9 @@ class _BottomNavPageState extends State<BottomNavPage> {
                           children: [
                             Icon(
                               icon,
-                              color: isActive ? Colors.white : Colors.white70,
+                              color: isActive
+                                  ? AppColorsPage.secondaryColor
+                                  : AppColorsPage.mutedText,
                             ),
                             const SizedBox(height: 4),
                             Text(
@@ -104,7 +106,9 @@ class _BottomNavPageState extends State<BottomNavPage> {
                                 fontWeight: isActive
                                     ? FontWeight.w600
                                     : FontWeight.w400,
-                                color: isActive ? Colors.white : Colors.white70,
+                                color: isActive
+                                    ? AppColorsPage.secondaryColor
+                                    : AppColorsPage.mutedText,
                               ),
                             ),
                             const SizedBox(height: 6),

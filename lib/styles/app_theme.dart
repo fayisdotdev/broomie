@@ -7,19 +7,22 @@ class AppTheme {
     final base = ThemeData.light();
     return base.copyWith(
       useMaterial3: true,
-      scaffoldBackgroundColor: AppColorsPage.backgroundNeutral,
-      textTheme: GoogleFonts.poppinsTextTheme(
-        base.textTheme,
-      ).apply(bodyColor: Colors.black87),
+      scaffoldBackgroundColor: AppColorsPage.primaryColor,
+      textTheme: GoogleFonts.poppinsTextTheme(base.textTheme).apply(
+        bodyColor: AppColorsPage.onBackground,
+        displayColor: AppColorsPage.onBackground,
+      ),
       primaryColor: AppColorsPage.secondaryColor,
       colorScheme: base.colorScheme.copyWith(
         primary: AppColorsPage.secondaryColor,
+        onPrimary: Colors.white,
         secondary: AppColorsPage.accentColor,
-        background: AppColorsPage.backgroundNeutral,
+        background: AppColorsPage.primaryColor,
         surface: AppColorsPage.surfaceNeutral,
+        onSurface: AppColorsPage.onBackground,
       ),
       appBarTheme: AppBarTheme(
-        backgroundColor: AppColorsPage.secondaryMedium,
+        backgroundColor: AppColorsPage.secondaryDark.withOpacity(0.9),
         elevation: 0,
         centerTitle: true,
         titleTextStyle: GoogleFonts.poppins(
@@ -27,20 +30,27 @@ class AppTheme {
           fontWeight: FontWeight.w600,
           color: Colors.white,
         ),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       cardColor: AppColorsPage.surfaceNeutral,
       elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+        style: ButtonStyle(
+          minimumSize: MaterialStateProperty.all(const Size(64, 48)),
+          padding: MaterialStateProperty.all(
+            const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
           ),
-          backgroundColor: AppColorsPage.secondaryColor,
-          elevation: 6,
-          textStyle: GoogleFonts.poppins(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
+          elevation: MaterialStateProperty.all(6),
+          backgroundColor: MaterialStateProperty.resolveWith((states) {
+            if (states.contains(MaterialState.pressed)) {
+              return AppColorsPage.secondaryDark;
+            }
+            return null; // use gradient via Ink for primary buttons
+          }),
+          shape: MaterialStateProperty.all(
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          ),
+          textStyle: MaterialStateProperty.all(
+            GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600),
           ),
         ),
       ),
@@ -55,10 +65,11 @@ class AppTheme {
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide.none,
         ),
+        hintStyle: TextStyle(color: AppColorsPage.mutedText),
       ),
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
-        backgroundColor: AppColorsPage.surfaceNeutral.withOpacity(0.6),
-        selectedItemColor: AppColorsPage.secondaryColor,
+        backgroundColor: AppColorsPage.glassBackground,
+        selectedItemColor: Colors.white,
         unselectedItemColor: AppColorsPage.mutedText,
         showUnselectedLabels: true,
       ),

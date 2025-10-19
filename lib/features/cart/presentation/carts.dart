@@ -5,8 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-
-
 class CartsScreen extends ConsumerStatefulWidget {
   const CartsScreen({super.key});
 
@@ -27,7 +25,8 @@ class _CartsScreenState extends ConsumerState<CartsScreen> {
         body: Center(
           child: Text(
             'Please sign in to view your cart',
-            style: TextStyle(color: AppColorsPage.textColor, fontSize: 16),
+            style:
+                Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 16),
           ),
         ),
       );
@@ -37,7 +36,7 @@ class _CartsScreenState extends ConsumerState<CartsScreen> {
     final cartCtrl = ref.read(cartControllerProvider.notifier);
 
     return Scaffold(
-      backgroundColor: AppColorsPage.primaryColor,
+      backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
         title: const Text('My Carts'),
         backgroundColor: AppColorsPage.secondaryColor,
@@ -52,8 +51,7 @@ class _CartsScreenState extends ConsumerState<CartsScreen> {
                 children: [
                   Text(
                     'Your cart is empty',
-                    style: TextStyle(
-                        fontSize: 18, color: AppColorsPage.textColor),
+                    style: Theme.of(context).textTheme.headlineSmall,
                   ),
                   const SizedBox(height: 12),
                   ElevatedButton(
@@ -63,7 +61,10 @@ class _CartsScreenState extends ConsumerState<CartsScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColorsPage.secondaryColor,
                     ),
-                    child: const Text('Browse Services'),
+                    child: const Text(
+                      'Browse Services',
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                 ],
               ),
@@ -83,12 +84,16 @@ class _CartsScreenState extends ConsumerState<CartsScreen> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      color: AppColorsPage.secondaryLight,
-                      child: ListTile(
-                        contentPadding: const EdgeInsets.symmetric(
+                      color: Theme.of(context).colorScheme.surface,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
                             horizontal: 12, vertical: 8),
-                        leading: it.imageUrl.isNotEmpty
-                            ? ClipRRect(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            // image
+                            if (it.imageUrl.isNotEmpty)
+                              ClipRRect(
                                 borderRadius: BorderRadius.circular(8),
                                 child: Image.network(
                                   it.imageUrl,
@@ -97,7 +102,8 @@ class _CartsScreenState extends ConsumerState<CartsScreen> {
                                   fit: BoxFit.cover,
                                 ),
                               )
-                            : CircleAvatar(
+                            else
+                              CircleAvatar(
                                 backgroundColor: AppColorsPage.secondaryLight,
                                 child: Text(
                                   it.name.isNotEmpty ? it.name[0] : '?',
@@ -105,68 +111,96 @@ class _CartsScreenState extends ConsumerState<CartsScreen> {
                                       fontWeight: FontWeight.bold),
                                 ),
                               ),
-                        title: Text(
-                          it.name,
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              color: AppColorsPage.textColor),
-                        ),
-                        subtitle: Text(
-                          '₹${it.price.toStringAsFixed(2)}',
-                          style: TextStyle(
-                              color: AppColorsPage.textColor),
-                        ),
-                        trailing: SizedBox(
-                          width: 120,
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton(
-                                icon: Icon(Icons.remove_circle_outline,
-                                    color: AppColorsPage.secondaryColor),
-                                onPressed: () async {
-                                  if (it.quantity > 1) {
-                                    final updated = CartItem(
-                                      id: it.id,
-                                      serviceId: it.serviceId,
-                                      name: it.name,
-                                      price: it.price,
-                                      quantity: it.quantity - 1,
-                                      imageUrl: it.imageUrl,
-                                    );
-                                    await cartCtrl.addItem(updated);
-                                  } else {
-                                    await cartCtrl.removeItem(it.id);
-                                  }
-                                },
+                            const SizedBox(width: 12),
+
+                            // name and price
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    it.name,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium
+                                        ?.copyWith(fontWeight: FontWeight.w600),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    '₹${it.price.toStringAsFixed(2)}',
+                                    style:
+                                        Theme.of(context).textTheme.bodyMedium,
+                                  ),
+                                ],
                               ),
-                              Text('${it.quantity}',
-                                  style: TextStyle(
-                                      color: AppColorsPage.textColor)),
-                              IconButton(
-                                icon: Icon(Icons.add_circle_outline,
-                                    color: AppColorsPage.secondaryColor),
-                                onPressed: () async {
-                                  final updated = CartItem(
-                                    id: it.id,
-                                    serviceId: it.serviceId,
-                                    name: it.name,
-                                    price: it.price,
-                                    quantity: it.quantity + 1,
-                                    imageUrl: it.imageUrl,
-                                  );
-                                  await cartCtrl.addItem(updated);
-                                },
+                            ),
+
+                            // quantity controls
+                            Flexible(
+                              flex: 0,
+                              child: Wrap(
+                                spacing: 0,
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                children: [
+                                  IconButton(
+                                    icon: Icon(
+                                      Icons.remove_circle_outline,
+                                      color: AppColorsPage.secondaryColor,
+                                    ),
+                                    onPressed: () async {
+                                      if (it.quantity > 1) {
+                                        final updated = CartItem(
+                                          id: it.id,
+                                          serviceId: it.serviceId,
+                                          name: it.name,
+                                          price: it.price,
+                                          quantity: it.quantity - 1,
+                                          imageUrl: it.imageUrl,
+                                        );
+                                        await cartCtrl.addItem(updated);
+                                      } else {
+                                        await cartCtrl.removeItem(it.id);
+                                      }
+                                    },
+                                  ),
+                                  Text(
+                                    '${it.quantity}',
+                                    style:
+                                        Theme.of(context).textTheme.bodyMedium,
+                                  ),
+                                  IconButton(
+                                    icon: Icon(
+                                      Icons.add_circle_outline,
+                                      color: AppColorsPage.secondaryColor,
+                                    ),
+                                    onPressed: () async {
+                                      final updated = CartItem(
+                                        id: it.id,
+                                        serviceId: it.serviceId,
+                                        name: it.name,
+                                        price: it.price,
+                                        quantity: it.quantity + 1,
+                                        imageUrl: it.imageUrl,
+                                      );
+                                      await cartCtrl.addItem(updated);
+                                    },
+                                  ),
+                                  IconButton(
+                                    icon: Icon(
+                                      Icons.delete_outline,
+                                      color: Colors.red.shade400,
+                                    ),
+                                    onPressed: () async {
+                                      await cartCtrl.removeItem(it.id);
+                                    },
+                                  ),
+                                ],
                               ),
-                              IconButton(
-                                icon: Icon(Icons.delete_outline,
-                                    color: Colors.red.shade400),
-                                onPressed: () async {
-                                  await cartCtrl.removeItem(it.id);
-                                },
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
                     );
@@ -182,8 +216,10 @@ class _CartsScreenState extends ConsumerState<CartsScreen> {
         },
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, st) => Center(
-          child: Text('Error: $e',
-              style: TextStyle(color: AppColorsPage.textColor)),
+          child: Text(
+            'Error: $e',
+            style: TextStyle(color: AppColorsPage.textColor),
+          ),
         ),
       ),
     );
@@ -192,7 +228,6 @@ class _CartsScreenState extends ConsumerState<CartsScreen> {
 
 class CartSummary extends ConsumerWidget {
   final List<CartItem> items;
-
   const CartSummary({super.key, required this.items});
 
   double get total => items.fold(0.0, (s, it) => s + it.price * it.quantity);
@@ -201,54 +236,77 @@ class CartSummary extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      color: AppColorsPage.secondaryLight,
+      color: Theme.of(context).colorScheme.surface,
       child: Padding(
         padding: const EdgeInsets.all(12.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Items: ${items.length}',
-                  style: TextStyle(color: AppColorsPage.textColor),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  'Total: ₹${total.toStringAsFixed(2)}',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: AppColorsPage.textColor),
-                ),
-              ],
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                final meta = {'notes': 'Booked from cart'};
-                final ctrl = ref.read(cartControllerProvider.notifier);
-                try {
-                  await ctrl.createBooking(meta);
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Booking created')),
-                    );
-                  }
-                } catch (e) {
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Booking failed: $e')),
-                    );
-                  }
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColorsPage.secondaryColor),
-              child: const Text('Create Booking'),
-            ),
-          ],
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final isCompact = constraints.maxWidth < 350;
+            return isCompact
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _summaryTexts(context),
+                      const SizedBox(height: 12),
+                      _actionButton(context, ref),
+                    ],
+                  )
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      _summaryTexts(context),
+                      _actionButton(context, ref),
+                    ],
+                  );
+          },
         ),
       ),
+    );
+  }
+
+  Widget _summaryTexts(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Items: ${items.length}',
+            style: Theme.of(context).textTheme.bodyMedium),
+        const SizedBox(height: 6),
+        Text(
+          'Total: ₹${total.toStringAsFixed(2)}',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).textTheme.bodyMedium?.color,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _actionButton(BuildContext context, WidgetRef ref) {
+    return ElevatedButton(
+      onPressed: () async {
+        final meta = {'notes': 'Booked from cart'};
+        final ctrl = ref.read(cartControllerProvider.notifier);
+        try {
+          await ctrl.createBooking(meta);
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Booking created')),
+            );
+          }
+        } catch (e) {
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Booking failed: $e')),
+            );
+          }
+        }
+      },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: AppColorsPage.secondaryColor,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      ),
+      child: const Text('Create Booking', style: TextStyle(color: Colors.white)),
     );
   }
 }

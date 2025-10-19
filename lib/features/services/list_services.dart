@@ -22,11 +22,13 @@ class ServicesListScreen extends ConsumerWidget {
       data: (categories) {
         if (categories.isEmpty) {
           return Scaffold(
-            backgroundColor: AppColorsPage.primaryColor,
+            backgroundColor: Theme.of(context).colorScheme.background,
             body: Center(
               child: Text(
                 'No categories found.',
-                style: TextStyle(color: AppColorsPage.mutedText, fontSize: 16),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(fontSize: 16),
               ),
             ),
           );
@@ -35,15 +37,16 @@ class ServicesListScreen extends ConsumerWidget {
         return DefaultTabController(
           length: categories.length,
           child: Scaffold(
-            backgroundColor: AppColorsPage.primaryColor,
+            backgroundColor: Theme.of(context).colorScheme.background,
             appBar: AppBar(
               title: const Text('Services'),
               backgroundColor: AppColorsPage.secondaryColor,
               elevation: 0,
               bottom: TabBar(
                 isScrollable: true,
-                indicatorColor: AppColorsPage.accentColor,
+                indicatorColor: AppColorsPage.secondaryDark,
                 tabs: categories.map((cat) => Tab(text: cat.name)).toList(),
+                labelColor: AppColorsPage.textColor,
               ),
             ),
             body: TabBarView(
@@ -164,7 +167,7 @@ class ServicesListScreen extends ConsumerWidget {
                         vertical: 12,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColorsPage.secondaryLight,
+                        color: Theme.of(context).colorScheme.surface,
                         borderRadius: const BorderRadius.vertical(
                           top: Radius.circular(12),
                         ),
@@ -191,10 +194,8 @@ class ServicesListScreen extends ConsumerWidget {
                                 });
                                 return Text(
                                   'Items: $count   Total: \$${total.toStringAsFixed(2)}',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColorsPage.mutedText,
-                                  ),
+                                  style: Theme.of(context).textTheme.bodyMedium
+                                      ?.copyWith(fontWeight: FontWeight.bold),
                                 );
                               },
                             ),
@@ -250,7 +251,7 @@ class ServicesListScreen extends ConsumerWidget {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppColorsPage.secondaryColor,
                             ),
-                            child: const Text('Add to cart'),
+                            child: const Text('Add to cart', style: TextStyle(color: Colors.white)),
                           ),
                         ],
                       ),

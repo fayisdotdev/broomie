@@ -1,25 +1,32 @@
-// Centralized color utilities for the app
+// Centralized color utilities and semantic tokens for the app
 import 'package:flutter/material.dart';
 import 'dart:math';
 
 class AppColorsPage {
-  // Core palette
-  static const Color primaryColor = Color(0xFFF7F8FA); // soft off-white
-  static const Color secondaryColor = Color(0xFF4CAF50); // green
-  static const Color accentColor = Color(0xFF66D17A); // pastel accent
+  // Base / neutrals
+  // Primary background (app canvas)
+  static const Color primaryColor = Color(0xFFF7F8FA); // near-white, airy
+  // Surface for cards and sheets
+  static const Color surfaceNeutral = Colors.white;
 
-  // Shade variations (derived)
-  static final Color secondaryLight = secondaryColor.withOpacity(0.92);
-  static final Color secondaryMedium = secondaryColor.withOpacity(0.72);
-  static final Color secondaryDark = Color(0xFF2E7D32);
+  // Brand colors
+  static const Color secondaryColor = Color(0xFF4CAF50); // green brand
+  static const Color accentColor = Color(0xFF66D17A); // light pastel
 
-  // Neutral surfaces
-  static final Color backgroundNeutral = Colors.grey.shade50;
-  static final Color surfaceNeutral = Colors.white;
+  // Derived shades
+  static final Color secondaryLight = secondaryColor.withOpacity(0.14);
+  static final Color secondaryMedium = secondaryColor.withOpacity(0.32);
+  static final Color secondaryDark = const Color(0xFF2E7D32);
+
+  // Text tokens
+  // Primary on-background text
+  static final Color onBackground = Colors.black87;
+  // Secondary / muted text
   static final Color mutedText = Colors.black54;
-  static final Color textColor = Colors.black54;
+  // Backwards-compatible alias (many files reference this)
+  static final Color textColor = mutedText;
 
-  // Accent gradient for buttons / highlights
+  // Accent gradient for buttons / highlights (signature)
   static final Gradient primaryGradient = LinearGradient(
     colors: [
       secondaryColor.withOpacity(0.95),
@@ -29,14 +36,17 @@ class AppColorsPage {
     end: Alignment.bottomRight,
   );
 
-  // Subtle glass background for float elements
+  // Subtle glass background for floating elements
   static final Color glassBackground = Colors.white.withOpacity(0.55);
 
-  // Utility
+  // Elevated blur overlay color for depth
+  static final Color elevationOverlay = Colors.black.withOpacity(0.06);
+
+  // Utilities
   static Color withOpacity(Color c, double t) => c.withOpacity(t);
 }
 
-// Small swatch preview widget
+// Small swatch preview widget (kept for dev/debug screens)
 class ColorBox extends StatelessWidget {
   final Color color;
   final String label;
