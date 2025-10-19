@@ -1,11 +1,11 @@
 import 'package:broomie/core/providers/category_provider.dart';
 import 'package:broomie/core/providers/service_provider.dart';
-import 'package:broomie/core/models/category_model.dart';
+import 'package:broomie/core/providers/cart_provider.dart';
+import 'package:broomie/core/models/cart_item_model.dart';
+import 'package:broomie/styles/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:broomie/core/providers/cart_provider.dart';
-import 'package:broomie/core/models/cart_item_model.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
 final _selectionProvider = StateProvider<Map<String, int>>((ref) => {});
@@ -18,20 +18,30 @@ class ServicesListScreen extends ConsumerWidget {
     final categoryAsync = ref.watch(categoriesProvider);
 
     return categoryAsync.when(
-      data: (List<Category> categories) {
+      data: (categories) {
         if (categories.isEmpty) {
-          return const Scaffold(
-            body: Center(child: Text('No categories found.')),
+          return Scaffold(
+            backgroundColor: AppColorsPage.primaryColor,
+            body: Center(
+              child: Text(
+                'No categories found.',
+                style: TextStyle(color: AppColorsPage.textColor, fontSize: 16),
+              ),
+            ),
           );
         }
 
         return DefaultTabController(
           length: categories.length,
           child: Scaffold(
+            backgroundColor: AppColorsPage.primaryColor,
             appBar: AppBar(
               title: const Text('Services'),
+              backgroundColor: AppColorsPage.secondaryColor,
+              elevation: 0,
               bottom: TabBar(
                 isScrollable: true,
+                indicatorColor: AppColorsPage.accentColor,
                 tabs: categories.map((cat) => Tab(text: cat.name)).toList(),
               ),
             ),
@@ -54,78 +64,123 @@ class ServicesListScreen extends ConsumerWidget {
                             final qty =
                                 selections[service.id ?? service.name] ?? 0;
                             return Card(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              color: AppColorsPage.lightBlue,
                               margin: const EdgeInsets.only(bottom: 12),
                               child: ListTile(
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 8,
+                                ),
                                 leading: service.imageUrl.isNotEmpty
-                                    ? Image.network(
-                                        service.imageUrl,
-                                        width: 64,
-                                        height: 64,
-                                        fit: BoxFit.cover,
+                                    ? ClipRRect(
+                                        borderRadius: BorderRadius.circular(8),
+                                        child: Image.network(
+                                          service.imageUrl,
+                                          width: 64,
+                                          height: 64,
+                                          fit: BoxFit.cover,
+                                        ),
                                       )
-                                    : const SizedBox(width: 64, height: 64),
-                                title: Text(service.name),
+                                    : CircleAvatar(
+                                        backgroundColor:
+                                            AppColorsPage.lightGreen,
+                                        child: Text(
+                                          service.name.isNotEmpty
+                                              ? service.name[0]
+                                              : '?',
+                                          style: TextStyle(
+                                            color: AppColorsPage.textColor,
+                                          ),
+                                        ),
+                                      ),
+                                title: Text(
+                                  service.name,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColorsPage.textColor,
+                                  ),
+                                ),
                                 subtitle: Text(
                                   '\$${service.price.toStringAsFixed(2)}',
+                                  style: TextStyle(
+                                    color: AppColorsPage.textColor,
+                                  ),
                                 ),
-                                trailing: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    IconButton(
-                                      icon: const Icon(
-                                        Icons.remove_circle_outline,
-                                      ),
-                                      onPressed: qty > 0
-                                          ? () {
-                                              final map = Map<String, int>.from(
-                                                selections,
-                                              );
-                                              final newQty =
-                                                  (map[service.id ??
-                                                          service.name] ??
-                                                      0) -
-                                                  1;
-                                              if (newQty <= 0) {
-                                                map.remove(
-                                                  service.id ?? service.name,
-                                                );
-                                              } else {
-                                                map[service.id ??
-                                                        service.name] =
-                                                    newQty;
+                                trailing: SizedBox(
+                                  width: 120,
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      IconButton(
+                                        icon: Icon(
+                                          Icons.remove_circle_outline,
+                                          color: qty > 0
+                                              ? AppColorsPage.secondaryColor
+                                              : Colors.grey.shade400,
+                                        ),
+                                        onPressed: qty > 0
+                                            ? () {
+                                                final map =
+                                                    Map<String, int>.from(
+                                                      selections,
+                                                    );
+                                                final newQty =
+                                                    (map[service.id ??
+                                                            service.name] ??
+                                                        0) -
+                                                    1;
+                                                if (newQty <= 0) {
+                                                  map.remove(
+                                                    service.id ?? service.name,
+                                                  );
+                                                } else {
+                                                  map[service.id ??
+                                                          service.name] =
+                                                      newQty;
+                                                }
+                                                ref
+                                                        .read(
+                                                          _selectionProvider
+                                                              .notifier,
+                                                        )
+                                                        .state =
+                                                    map;
                                               }
-                                              ref
-                                                      .read(
-                                                        _selectionProvider
-                                                            .notifier,
-                                                      )
-                                                      .state =
-                                                  map;
-                                            }
-                                          : null,
-                                    ),
-                                    Text('$qty'),
-                                    IconButton(
-                                      icon: const Icon(
-                                        Icons.add_circle_outline,
+                                            : null,
                                       ),
-                                      onPressed: () {
-                                        final map = Map<String, int>.from(
-                                          selections,
-                                        );
-                                        map[service.id ?? service.name] =
-                                            (map[service.id ?? service.name] ??
-                                                0) +
-                                            1;
-                                        ref
-                                                .read(
-                                                  _selectionProvider.notifier,
-                                                )
-                                                .state =
-                                            map;
-                                      },
-                                    ),
-                                  ],
+                                      Text(
+                                        '$qty',
+                                        style: TextStyle(
+                                          color: AppColorsPage.textColor,
+                                        ),
+                                      ),
+                                      IconButton(
+                                        icon: Icon(
+                                          Icons.add_circle_outline,
+                                          color: AppColorsPage.secondaryColor,
+                                        ),
+                                        onPressed: () {
+                                          final map = Map<String, int>.from(
+                                            selections,
+                                          );
+                                          map[service.id ?? service.name] =
+                                              (map[service.id ??
+                                                      service.name] ??
+                                                  0) +
+                                              1;
+                                          ref
+                                                  .read(
+                                                    _selectionProvider.notifier,
+                                                  )
+                                                  .state =
+                                              map;
+                                        },
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             );
@@ -133,21 +188,30 @@ class ServicesListScreen extends ConsumerWidget {
                         ),
                         loading: () =>
                             const Center(child: CircularProgressIndicator()),
-                        error: (e, _) => Center(child: Text('Error: $e')),
+                        error: (e, _) => Center(
+                          child: Text(
+                            'Error: $e',
+                            style: TextStyle(color: AppColorsPage.textColor),
+                          ),
+                        ),
                       ),
                     ),
-                    // Bottom summary and add to cart
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 16,
-                        vertical: 8,
+                        vertical: 12,
                       ),
-                      color: Theme.of(context).scaffoldBackgroundColor,
+                      decoration: BoxDecoration(
+                        color: AppColorsPage.lightGreen,
+                        borderRadius: const BorderRadius.vertical(
+                          top: Radius.circular(12),
+                        ),
+                      ),
                       child: Row(
                         children: [
                           Expanded(
                             child: Consumer(
-                              builder: (c, r, _) {
+                              builder: (context, r, _) {
                                 final sel = r.watch(_selectionProvider);
                                 double total = 0;
                                 int count = 0;
@@ -156,7 +220,7 @@ class ServicesListScreen extends ConsumerWidget {
                                 );
                                 sAsync.whenData((slist) {
                                   for (final s in slist) {
-                                    final q = (sel[s.id ?? s.name] ?? 0);
+                                    final q = sel[s.id ?? s.name] ?? 0;
                                     if (q > 0) {
                                       count += q;
                                       total += s.price * q;
@@ -165,6 +229,10 @@ class ServicesListScreen extends ConsumerWidget {
                                 });
                                 return Text(
                                   'Items: $count   Total: \$${total.toStringAsFixed(2)}',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColorsPage.textColor,
+                                  ),
                                 );
                               },
                             ),
@@ -197,23 +265,18 @@ class ServicesListScreen extends ConsumerWidget {
                                 cartControllerProvider.notifier,
                               );
                               for (final entry in sel.entries) {
-                                // ignore: avoid_init_to_null
-                                var found = null;
-                                for (final s in sList) {
-                                  if ((s.id ?? s.name) == entry.key) {
-                                    found = s;
-                                    break;
-                                  }
-                                }
-                                if (found == null) continue;
-                                final service = found;
+                                final foundIndex = sList.indexWhere(
+                                  (s) => (s.id ?? s.name) == entry.key,
+                                );
+                                if (foundIndex == -1) continue;
+                                final found = sList[foundIndex];
                                 final item = CartItem(
                                   id: '',
-                                  serviceId: service.id ?? '',
-                                  name: service.name,
-                                  price: service.price,
+                                  serviceId: found.id ?? '',
+                                  name: found.name,
+                                  price: found.price,
                                   quantity: entry.value,
-                                  imageUrl: service.imageUrl,
+                                  imageUrl: found.imageUrl,
                                 );
                                 await controller.addItem(item);
                               }
@@ -222,6 +285,9 @@ class ServicesListScreen extends ConsumerWidget {
                                 const SnackBar(content: Text('Added to cart')),
                               );
                             },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColorsPage.secondaryColor,
+                            ),
                             child: const Text('Add to cart'),
                           ),
                         ],
@@ -234,10 +300,19 @@ class ServicesListScreen extends ConsumerWidget {
           ),
         );
       },
-      loading: () =>
-          const Scaffold(body: Center(child: CircularProgressIndicator())),
-      error: (e, _) =>
-          Scaffold(body: Center(child: Text('Error loading categories'))),
+      loading: () => Scaffold(
+        backgroundColor: AppColorsPage.primaryColor,
+        body: const Center(child: CircularProgressIndicator()),
+      ),
+      error: (e, _) => Scaffold(
+        backgroundColor: AppColorsPage.primaryColor,
+        body: Center(
+          child: Text(
+            'Error loading categories',
+            style: TextStyle(color: AppColorsPage.textColor),
+          ),
+        ),
+      ),
     );
   }
 }

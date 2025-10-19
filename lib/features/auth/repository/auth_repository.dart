@@ -2,10 +2,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter/foundation.dart'; // for kIsWeb
-
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:broomie/core/models/auth_model.dart';
 
 class AuthRepository {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   GoogleSignIn? _googleSignIn; // lazy init, avoid web assertion
 
   /// Stream for auth state changes
@@ -17,10 +19,11 @@ class AuthRepository {
   /// Sign in with Google (mobile + web)
   Future<UserCredential?> signInWithGoogle() async {
     try {
+      UserCredential? userCred;
       if (kIsWeb) {
         // Web: Use Firebase popup (no google_sign_in_web client init required here)
         GoogleAuthProvider googleProvider = GoogleAuthProvider();
-        return await _auth.signInWithPopup(googleProvider);
+        userCred = await _auth.signInWithPopup(googleProvider);
       } else {
         // Mobile: initialize lazily
         _googleSignIn ??= GoogleSignIn.standard();
@@ -35,8 +38,15 @@ class AuthRepository {
           idToken: googleAuth.idToken,
         );
 
-        return await _auth.signInWithCredential(credential);
+        userCred = await _auth.signInWithCredential(credential);
       }
+
+      // Save user to Firestore when newly signed in
+      if (userCred.user != null) {
+        await saveUserToDb(userCred.user!);
+      }
+
+      return userCred;
     } catch (e) {
       // Use proper logging instead of print in production
       print("Google sign-in error: $e");
@@ -45,11 +55,15 @@ class AuthRepository {
   }
 
   /// Sign in with email & password
-  Future<UserCredential> signInWithEmail(
-      {required String email, required String password}) async {
+  Future<UserCredential> signInWithEmail({
+    required String email,
+    required String password,
+  }) async {
     try {
       return await _auth.signInWithEmailAndPassword(
-          email: email, password: password);
+        email: email,
+        password: password,
+      );
     } catch (e) {
       print("Email sign-in error: $e");
       rethrow;
@@ -57,11 +71,20 @@ class AuthRepository {
   }
 
   /// Sign up with email & password
-  Future<UserCredential> signUpWithEmail(
-      {required String email, required String password}) async {
+  Future<UserCredential> signUpWithEmail({
+    required String email,
+    required String password,
+  }) async {
     try {
-      return await _auth.createUserWithEmailAndPassword(
-          email: email, password: password);
+      final userCred = await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      // Save new user to Firestore
+      if (userCred.user != null) {
+        await saveUserToDb(userCred.user!);
+      }
+      return userCred;
     } catch (e) {
       print("Email sign-up error: $e");
       rethrow;
@@ -107,6 +130,23 @@ class AuthRepository {
       verificationId: verificationId,
       smsCode: otp,
     );
-    return await _auth.signInWithCredential(credential);
+    final userCred = await _auth.signInWithCredential(credential);
+    if (userCred.user != null) {
+      await saveUserToDb(userCred.user!);
+    }
+    return userCred;
+  }
+
+  /// Save user to Firestore 'users' collection
+  Future<void> saveUserToDb(User user) async {
+    final userDoc = _firestore.collection('users').doc(user.uid);
+    final appUser = AppUser(
+      uid: user.uid,
+      email: user.email,
+      displayName: user.displayName,
+      photoUrl: user.photoURL,
+      phoneNumber: user.phoneNumber,
+    );
+    await userDoc.set(appUser.toMap(), SetOptions(merge: true));
   }
 }
