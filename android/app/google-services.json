@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "704397564191",
+    "project_id": "broomie-812da",
+    "storage_bucket": "broomie-812da.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:704397564191:android:0b9f98962c1edaf650782a",
+        "android_client_info": {
+          "package_name": "com.example.broomie"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "704397564191-b9uae3lcan5fn38rv97ppumkfpvh0thv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.broomie",
+            "certificate_hash": "b4736d7bf415ccb1cb3224ec9fc2a3ff346c8793"
+          }
+        },
+        {
+          "client_id": "704397564191-7oj04tbhi6pbfhqdrqs882sofciepp2m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB5DI6iN0nxy4_x-aAejLGNq3B1lLDCqBI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "704397564191-7oj04tbhi6pbfhqdrqs882sofciepp2m.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
