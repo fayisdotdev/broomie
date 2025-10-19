@@ -37,7 +37,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 await authCtrl.signInWithGoogle();
               },
               icon: const Icon(Icons.g_mobiledata),
-              label: const Text("Sign in with Google"),
+              label: const Text("Sign in with Google", style: TextStyle(color: Colors.white)),
             ),
 
             const Divider(height: 40),
@@ -69,7 +69,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ).showSnackBar(SnackBar(content: Text('Login failed: $e')));
                 }
               },
-              child: const Text("Login with Email"),
+              child: const Text("Login with Email", style: TextStyle(color: Colors.white),),
             ),
 
             TextButton(
@@ -125,7 +125,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   );
                 }
               },
-              child: Text(codeSent ? "Verify OTP" : "Send OTP"),
+              child: Text(codeSent ? "Verify OTP" : "Send OTP", style: TextStyle(color: Colors.white)),
             ),
           ],
         ),
